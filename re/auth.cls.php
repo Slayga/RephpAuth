@@ -45,17 +45,18 @@ class ReAuthentication {
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $result = $stmt->get_result();
+        $stmt->close();
 
         if ($result->num_rows === 1) {
             $user_data = $result->fetch_assoc();
-            $stmt->close();
 
             // Check if password is correct
             if (password_verify($password, $user_data['password'])) {
                 // Pop the password from user_data for security
                 unset($user_data['password']);
                 
-                // $this->set_session_and_class($user_data);
+                $this->set_session($user_data);
+                $this->set_class($user_data);
                 
                 $return['error'] = false;
                 $return['message'] = "Login: Success";
@@ -72,7 +73,9 @@ class ReAuthentication {
     public function logout() {
         $this->unset_session();
         $this->unset_class();
-        session_destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
 
         $return['error'] = false;
         $return['message'] = "Logout: Success";
@@ -87,7 +90,7 @@ class ReAuthentication {
         $return['message'] = "Signup: Unknown error";
 
         // Check if username is already taken, stmt
-        $stmt = $this->dbConn->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt = $this->dbConn->prepare("SELECT username FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $stmt->bind_result($stmt_result);
@@ -112,19 +115,20 @@ class ReAuthentication {
         }
 
         // Hash password
-        $password = password_hash($password, PASSWORD_DEFAULT);
+        $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
         // Insert user into database
         $stmt = $this->dbConn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-        $stmt->bind_param("ss", $username, $password);
+        $stmt->bind_param("ss", $username, $password_hash);
         $stmt->execute();
         $stmt->close();
 
         // Auto login
         if ($log_me_in) {
             $login_result = $this->login($username, $password);
+            unset($password);
             if ($login_result['error']) {
-                $return['message'] = "Signup: User signed up, but auto login failed";
+                $return['message'] = "Signup: User signed up, but auto login failed" . " | " . $login_result['message'];
                 return $return;
             } else{
                 $return['error'] = false;
@@ -132,6 +136,7 @@ class ReAuthentication {
                 return $return;
             }
         } else {
+            unset($password);
             $return['error'] = false;
             $return['message'] = "Signup: User signed up";
             return $return;
@@ -171,5 +176,27 @@ class ReAuthentication {
 
             $this->permissions = $_SESSION["permissions"];
         }
+    }
+
+    private function set_session($user_data) {
+        $_SESSION['user_id'] = $user_data['id'];
+        $_SESSION['username'] = $user_data['username'];
+        $_SESSION['is_logged'] = true;
+        $_SESSION['is_admin'] = $user_data['is_admin'];
+        $_SESSION['is_banned'] = $user_data['is_banned'];
+        $_SESSION['is_guest'] = false;
+
+        $_SESSION["permissions"] = $user_data["permissions"];
+    }
+
+    private function set_class($user_data) {
+        $this->user_id = $user_data['id'];
+        $this->username = $user_data['username'];
+        $this->is_logged = true;
+        $this->is_admin = $user_data['is_admin'];
+        $this->is_banned = $user_data['is_banned'];
+        $this->is_guest = false;
+
+        $this->permissions = $user_data["permissions"];
     }
 }
