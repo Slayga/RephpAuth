@@ -14,12 +14,10 @@ class ReDatabase {
      * 
      * @return mysqli
      */
-    public function __construct($db_name, $db_host, $db_user, $db_password) {
-        $this->db = new mysqli($db_host, $db_user, $db_password, $db_name);
+    public function __construct($db) {
+        $this->db = new mysqli($db['db_host'], $db['db_user'], $db['db_pass'], $db['db_name']);
         if ($this->db->connect_errno) {
             die("Failed to connect to MySQLI: (" . $this->db->connect_errno . ")");
-        } else {
-            return $this->db;
         }
     }
 
