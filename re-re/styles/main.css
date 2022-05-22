@@ -10,3 +10,17 @@
     /* Red */
     background-color: #fd8880cb;
 }
+
+.navbar, #navbar {
+    /* Modern light blue background */
+    background-color: #16488e9f;
+    display:grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "logo navbar-links";
+    grid-gap: 10px;
+    justify-items: center;
+    align-items: center;
+    padding: 10px;
+    
+  }
