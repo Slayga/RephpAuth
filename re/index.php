@@ -11,25 +11,19 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $username = $_POST["username"];
         $password = $_POST["password"];
         $return = $auth->login($username, $password);
+
     } else if (isset($_POST["signup"])) {
         $username = $_POST["username"];
         $password = $_POST["password"];
-        $return = $auth->signup($username, $password);
+        $auto_login = $_POST["auto_login"];
+        $return = $auth->signup($username, $password, $auto_login);
+
     } else if (isset($_POST["logout"])) {
         $return = $auth->logout();
-    } if (isset($return["error"]) && $return["error"]) {
-        print_r($return);
+    } else if (isset($_POST["reg"])) {
+        $_SESSION['current_form'] = "signup";
     }
 
-}
-
-if ($auth->is_logged) {
-    echo "Welcome: " . $auth->username;
-} else if ($auth->is_guest){
-    echo "Welcome: Guest";
-} else {
-    header("Location: error.php?error=403");
-    exit();
 }
 ?>
 
@@ -44,33 +38,26 @@ if ($auth->is_logged) {
 </head>
 
 <body>
-    <?php if ($auth->is_guest) { ?>
-    <h1>Login</h1>
-    <!-- Login -->
-    <form action="index.php" method="post">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="submit" name="login" value="login">
-    </form>
-    <?php } ?>
-
-    <?php if ($auth->is_guest) { ?>
-    <h1>Signup</h1>
-    <!-- Signup -->
-    <form action="index.php" method="post">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="submit" name="signup" value="signup">
-    </form>
-    <?php } ?>
-
-    <?php if($auth->is_logged){ ?>
-    <h1>Logout</h1>
-    <!-- Logout -->
-    <form action="index.php" method="post">
-        <input type="submit" name="logout" value="logout">
-    </form>
-    <?php } ?>
+    <header>
+        <h1>Gallery</h1>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Gallery</a>
+        </nav>
+        <a href="#">Login</a>
+    </header>
+    <main>
+        <?php 
+            $current = $_SESSION['current_form'] ?? "login";
+            if ($current == "login") {
+                include_once "login.php";
+            } else if ($current == "signup") {
+                include_once "signup.php";
+            }
+        ?>
+    </main>
 </body>
 
 </html>
