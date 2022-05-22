@@ -1,6 +1,6 @@
 <?php 
 // Re-Re-rewrite of the auth class again(again(again))
-include_once __DIR__ . "/config.php";
+include_once __DIR__ . "/../config.php";
 include_once __DIR__ . "/database.cls.php";
 
 class ReAuthentication {
