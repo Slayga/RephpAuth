@@ -87,7 +87,7 @@ class ReAuthentication {
         $return['message'] = "Signup: Unknown error";
 
         // Check if username is already taken, stmt
-        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt = $this->dbConn->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $stmt->bind_result($stmt_result);
@@ -115,7 +115,7 @@ class ReAuthentication {
         $password = password_hash($password, PASSWORD_DEFAULT);
 
         // Insert user into database
-        $stmt = $this->db->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+        $stmt = $this->dbConn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
         $stmt->bind_param("ss", $username, $password);
         $stmt->execute();
         $stmt->close();
