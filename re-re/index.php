@@ -31,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     // Redirect to login form
     } elseif (isset($_POST["login_redirect"])) {
         $_SESSION['current_form'] = "login";
+    
+    //  Redirect from posting and getting error return
     } else {
     $_SESSION['current_form'] = $_POST["current_form"] ?? "login";
     }
