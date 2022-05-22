@@ -6,7 +6,7 @@
 </nav>
 <div class="header__form-wrap">
     <?php if ($auth->is_logged) {include_once __DIR__ . "/../profile.inc.php";} ?>
-    <?php if($auth->is_logged) {include_once __DIR__ . "/../logout.inc.php";} ?>
+    <?php if($auth->is_logged) {include_once __DIR__ . "/../forms/logout.inc.php";} ?>
 </div>
 
 <style>

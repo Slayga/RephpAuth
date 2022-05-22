@@ -19,11 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
             $return = $auth->signup($username, $password, $auto_login);
 
             
-        }
-    // Logout form submitted
-    } else if (isset($_POST["logout"])) {
-        $return = $auth->logout();
-    } 
+        // Logout form submitted
+        } else if (isset($_POST["logout"])) {
+            $return = $auth->logout();
+        } 
+    }
     
     // Redirect to signup form
     if (isset($_POST["signup_redirect"])) {
@@ -72,15 +72,15 @@ $_SESSION['unique_rand'] = strval(rand());
             if (!$auth->is_logged) {
                 $current_form = $_SESSION['current_form'] ?? "login";
                 if ($current_form == "login") {
-                    include_once __DIR__ . "/includes/login.inc.php";
+                    include_once __DIR__ . "/includes/forms/login.inc.php";
                 } else if ($current_form == "signup") {
-                    include_once __DIR__ . "/includes/signup.inc.php";
+                    include_once __DIR__ . "/includes/forms/signup.inc.php";
                 } if (isset($return) && $return["error"]) {
                     echo "<p class='alert'>{$return['message']}</p>";
                 }
             } else {
                 echo "<p>You are logged in as {$auth->username}</p>";
-                include_once __DIR__ . "/includes/logout.inc.php";
+                include_once __DIR__ . "/includes/forms/logout.inc.php";
             }
         ?>
         </div>
