@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . './includes/sync.inc.php';
-// Send away unhauthorized users
+// Send away unauthorized users
 if (!$auth->is_logged) {
     header("Location: ./");
     exit();
