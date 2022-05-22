@@ -105,12 +105,12 @@ class ReAuthentication {
 
         // Preg match username, password (use Regex from ReBranded-Gallery)
         if (!preg_match("/^[a-zA-Z0-9 .!_-]{3,20}+$/", $username)) {
-            $return['message'] = "Signup: Username must be between 3 and 20 characters and can only contain letters, numbers and the following symbols: .!_-";
+            $return['message'] = "Signup: Username must be between 3 and 20 characters and can only contain letters, numbers and the following symbols: . ! _ -";
             return $return;
         }
 
         if (!preg_match("/^[a-zA-Z0-9 .!_-]{6,255}+$/", $password)) {
-            $return['message'] = "Signup: Password must be between 6 and 255 characters and can only contain letters, numbers and the following symbols: .!_-";
+            $return['message'] = "Signup: Password must be between 6 and 255 characters and can only contain letters, numbers and the following symbols: . ! _ -";
             return $return;
         }
 
