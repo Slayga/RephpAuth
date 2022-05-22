@@ -1,322 +1,175 @@
 <?php 
-// Re-rewrite of the auth class again(again)
-class ReDatabase {
-    private $db;
+// Re-Re-rewrite of the auth class again(again(again))
+include_once __DIR__ . "/config.php";
+include_once __DIR__ . "/database.cls.php";
 
-    /**
-     * Constructor of ReDatabase class, initializes and returns 
-     * a database connection (OOP, not procedural)
-     *
-     * @param string $db_name
-     * @param string $db_host
-     * @param string $db_user
-     * @param string $db_password
-     * 
-     * @return mysqli
-     */
-    public function __construct($db_name, $db_host, $db_user, $db_password) {
-        $this->db = new mysqli($db_host, $db_user, $db_password, $db_name);
-        if ($this->db->connect_errno) {
-            die("Failed to connect to MySQLI: (" . $this->db->connect_errno . ")");
-        } else {
-            return $this->db;
-        }
-    }
-
-    public function get_connection(){
-        // Returns the connection object
-        return $this->db;
-    }
-}
-
-
-class ReAuth {
-    private $db;
-    private $config;
+class ReAuthentication {
+    // What will authenticate do?
+    // Constructor will be used to set up the database connection
+    // 1. Handle login
+    // 2. Handle logout
+    // 3. Handle signup
+    // 4. Handle session ($_SESSION)
+    // 5. Handle class variables (is_logged in, is_admin, etc)
+    // 6. Handle user data (user_id, username, etc)
+    // 7. Handle user permissions (can_edit, can_delete, etc)
     
-    private $user_id;
-    private $username;
-    private $user_alias;
-    
-    private $is_admin;
-    private $is_logged_in;
-    private $is_authenticated_session;
-
-    /**
-     * Constructor of ReAuth class, initializes database connection and starts
-     * session if not already started
-     *
-     * @param array $config Configuration array of db options: name, user, password, host.
-     * With the keys 'db_name', 'db_user', 'db_pass', 'db_host'.
-     * 
-     * @return void
-     */
+    // Constructor
     public function __construct($config) {
-        $this->db = new ReDatabase($config['db_name'], $config['db_host'], $config['db_user'], $config['db_pass']);
+        $this->db = new ReDatabase($config['db']);
+        $this->dbConn = $this->db->get_connection();
         $this->config = $config;
-
-        $this->user_id = "";
-        $this->username = "";
-        $this->user_alias = "";
-
+        
+        // User data
+        $this->user_id = null;
+        $this->username = null;
+        $this->is_logged = false;
         $this->is_admin = false;
-        $this->is_logged_in = false;
-        $this->is_authenticated_session = false;
+        $this->is_banned = false;
+        $this->is_guest = true;
 
-        $this->session_start();
+        // User permissions, mainly for gallery.. Example: can_edit & can_delete.
+        $this->permissions = array();
+
+        // Session
+        $this->check_session();
     }
-
-    public function session_start() {
-        $return["error"] = true;
-        $return["message"] = "Unknown error";
-        if(session_status() !== PHP_SESSION_ACTIVE){
-            session_start();
-            
-            $return["error"] = false;
-            $return["message"] = "Session started";
-        } else {
-            $return["message"] = "Session already started";
-        }
-        return $return;
-    }
-
-    public function session_destroy() {
-        session_destroy();
-    }
-
-    public function session_regenerate() {
-        session_regenerate_id(true);
-    }
-
-    public function session_restart() {
-        $this->session_destroy();
-        $this->session_start();
-        $this->session_regenerate_id();
-    }
-
-    public function is_logged_in() {
-        // Check again if user is logged in.
-        // If not, check if there is a session
-        if(!$this->is_logged_in) {
-            if(isset($_SESSION["user_id"]) && isset($_SESSION["username"]) && isset($_SESSION["user_alias"])) {
-                $this->user_id = $_SESSION["user_id"];
-                $this->username = $_SESSION["username"];
-                $this->user_alias = $_SESSION["user_alias"];
-                $this->is_logged_in = true;
-            } else {
-                $this->is_logged_in = false;
-            }
-        }
-        return $this->is_logged_in;
-    }
-
-    public function is_authenticated_session() {
-        if ($this->is_logged_in()) {
-            return $this->is_authenticated_session;
-        } else {
-            return false;
-        }
-        return $this->is_authenticated_session;
-    }
-
-    public function is_admin() {
-        return $this->is_admin;
-    }
-
-    public function get_user_id() {
-        return $this->user_id;
-    }
-
-    public function get_username() {
-        return $this->username;
-    }
-
-    public function get_user_alias() {
-        return $this->user_alias;
-    }
-
+    
+    // 1. Handle login
     public function login($username, $password) {
-        $return["error"] = true;
-        $return["message"] = "Unknown error when logging in";
+        $return['error'] = true;
+        $return['message'] = "Login: Unknown error";
 
-        if ($this->is_logged_in) {
-            $return["message"] = "Already logged in";
-            return $return;
-        }
-        // Prepared statement, for best security practice.
-        // Get the username from db, and grab the password to verify against input.
-        $stmt = $this->db->prepare("SELECT id, username, password, alias, is_admin FROM users WHERE username = ?"); 
+        // Check if user exists
+        $stmt = $this->dbConn->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
-        $stmt->bind_result($id, $db_username, $password_hash, $alias, $is_admin);
-        $stmt->fetch();
-        $stmt->close();
-        
-        // If the username exists, compare the password.
-        if($db_username !== null) {
-            if(password_verify($password, $password_hash)) {
-                // If the password is correct, set the session variables.
-                $_SESSION['user_id'] = $this->user_id = $id;
-                $_SESSION['username'] = $this->username = $db_username;
-                $_SESSION['user_alias'] = $this->user_alias = $alias;
-                $_SESSION['is_logged_in'] = $this->is_logged_in = true;
-                $_SESSION['is_authenticated_session'] = $this->is_authenticated_session = true;
-                $_SESSION['is_admin'] = $this->is_admin = $is_admin;
+        $result = $stmt->get_result();
 
-                $return["error"] = false;
-                $return["message"] = "Logged in";
-                return $return;
-            } else {
-                // If the password is incorrect, return false.
-                $this->session_restart();
-                $return["message"] = "Incorrect password";
-                return $return;
-            }
-        } else {
-            // If the username doesn't exist, return false.
-            $this->session_restart();
-            $return["message"] = "Username doesn't exist";
-            return $return;
-        }
-        return $return;
-    }
-
-    public function logout() {
-        $return["error"] = true;
-        $return["message"] = "Unknown error when logging out";
-        // Unset all of the session variables.
-        $_SESSION = array();
-
-        // Unset all object variables.
-        $this->user_id = "";
-        $this->username = "";
-        $this->user_alias = "";
-
-        $this->is_admin = false;
-        $this->is_logged_in = false;
-        $this->is_authenticated_session = false;
-
-        $this->session_restart();
-
-        $return["error"] = false;
-        $return["message"] = "Logged out";
-        return $return;
-    }
-
-    public function signup($username, $password, $alias, $auto_login) {
-        $return["error"] = true;
-        $return["message"] = "Unknown error when signing up";
-
-        # Check if username is 3-40 characters long, Characters, number and ". ! _ -" are allowed.
-        if (!preg_match("/^[a-zA-Z0-9 .!_-]{3,40}+$/", $username)) {
-            $return["message"] = "Invalid username";
-            return $return;
-        }
-        if (!preg_match("/^[a-zA-Z0-9 .!_-]{7,255}+$/", $password)) {
-            $return["message"] = "Invalid password";
-            return $return;
-        }
-        
-        // Prepared statement, for best security practice.
-        // Check for username availability.
-        $stmt = $this->db->prepare("SELECT username FROM users WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $stmt->bind_result($db_username);
-        $stmt->fetch();
-        $stmt->close();
-
-        // If the username is available, create the user.
-        if($db_username === null) {
-            // Hash the password.
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-
-            // Insert the user into the database.
-            $stmt = $this->db->prepare("INSERT INTO users (username, password, alias) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $username, $password_hash, $alias);
-            $stmt->execute();
+        if ($result->num_rows === 1) {
+            $user_data = $result->fetch_assoc();
             $stmt->close();
 
-            $return["error"] = false;
-            $return["message"] = "Signed up";
-
-            // If the user is to be auto-logged in, log them in.
-            if($auto_login) {
-                $auto_login_result = $this->login($username, $password);
-                if($auto_login_result["error"]) {
-                    // Append the error message to current message if any.
-                    $return["message"] .= " | " . $auto_login_result["message"];
-                    $return["error"] = true;
-                    return $return;
-                }
+            // Check if password is correct
+            if (password_verify($password, $user_data['password'])) {
+                // Pop the password from user_data for security
+                unset($user_data['password']);
+                
+                // $this->set_session_and_class($user_data);
+                
+                $return['error'] = false;
+                $return['message'] = "Login: Success";
+            } else {
+                $return['message'] = "Login: Wrong password";
             }
-
-            
-            return $return;
         } else {
-            // If the username is not available, return false.
-            $return["message"] = "Username already exists";
-            $return["error"] = true;
-            return $return;
+            $return['message'] = "Login: User not found";
         }
-
-    }
-}
-
-
-class ReGallery {
-    private $db;
-    private $username;
-    
-    public function __construct($db, $username) {
-        $this->db = $db;
-        $this->username = $username;
-    }
-
-    public function create_post($name, $description, $is_public, $posted_by, $filename) {
-        $return["error"] = true;
-        $return["message"] = "Unknown error";
-
-        // $_FILE global variable.
-        $file_path = $_FILES[$filename]["tmp_name"];
-        $file_size = filesize($file_path);
-        $file_info = finfo_open(FILEINFO_MIME_TYPE);
-        if (empty($file_info)) {
-            $return["message"] = "Could not get file info";
-            return $return;
-        }
-        $file_type = finfo_file($file_info, $file_path);
-
-        // Check if the file is an image.
-        if(!in_array($file_type, array("image/jpeg", "image/png", "image/gif"))) {
-            $return["message"] = "File is not an image";
-            return $return;
-        }
-
-        // The max file size is 10MB.
-        if($file_size > 10000000) {
-            $return["message"] = "File is too large";
-            return $return;
-        }
-
-        // Rename the file, take into account: date, time, username, random md5 hash.
-        $file_name = date("Y-m-d-H-i-s") . "-" . $this->username . "-" . md5(uniqid(rand(), true)) . "." . pathinfo($_FILES[$filename]["name"], PATHINFO_EXTENSION);
-
-        // Move the file to the gallery folder and subdirectory of the username
-        move_uploaded_file($file_path, "../gallery/" . $posted_by . "/" . $file_name);
-
-        // New path to the post.
-        $path = "gallery/" . $posted_by . "/" . $file_name;
-
-        // Insert the post into the database.
-        $stmt = $this->db->prepare("INSERT INTO gallery (name, description, is_public, posted_by, path) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $name, $description, $is_public, $posted_by, $file_name);
-        $stmt->execute();
-        $stmt->close();
-
-        $return["error"] = false;
-        $return["message"] = "Created post";
         return $return;
     }
 
+    // 2. Handle logout
+    public function logout() {
+        $this->unset_session();
+        $this->unset_class();
+        session_destroy();
+
+        $return['error'] = false;
+        $return['message'] = "Logout: Success";
+        return $return;
+        
+    }
+
+    // 3. Handle signup
+    public function signup($username, $password, $log_me_in) {
+        // Create return array, with "error" and "message" keys
+        $return['error'] = true;
+        $return['message'] = "Signup: Unknown error";
+
+        // Check if username is already taken, stmt
+        $stmt = $this->db->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($stmt_result);
+        $stmt->fetch();
+        $stmt->close();
+
+        // Check if username is already taken, if so, return error
+        if ($stmt_result) {
+            $return['message'] = "Signup: Username already taken";
+            return $return;
+        }
+
+        // Preg match username, password (use Regex from ReBranded-Gallery)
+        if (!preg_match("/^[a-zA-Z0-9 .!_-]{3,20}+$/", $username)) {
+            $return['message'] = "Signup: Username must be between 3 and 20 characters and can only contain letters, numbers and the following symbols: .!_-";
+            return $return;
+        }
+
+        if (!preg_match("/^[a-zA-Z0-9 .!_-]{6,255}+$/", $password)) {
+            $return['message'] = "Signup: Password must be between 6 and 255 characters and can only contain letters, numbers and the following symbols: .!_-";
+            return $return;
+        }
+
+        // Hash password
+        $password = password_hash($password, PASSWORD_DEFAULT);
+
+        // Insert user into database
+        $stmt = $this->db->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+        $stmt->close();
+
+        // Auto login
+        if ($log_me_in) {
+            $login_result = $this->login($username, $password);
+            if ($login_result['error']) {
+                $return['message'] = "Signup: User signed up, but auto login failed";
+                return $return;
+            } else{
+                $return['error'] = false;
+                $return['message'] = "Signup: User signed up and auto logged in";
+                return $return;
+            }
+        } else {
+            $return['error'] = false;
+            $return['message'] = "Signup: User signed up";
+            return $return;
+        }
+    }
+
+    private function unset_session() {
+        unset($_SESSION['user_id']);
+        unset($_SESSION['username']);
+        unset($_SESSION['is_logged']);
+        unset($_SESSION['is_admin']);
+        unset($_SESSION['is_banned']);
+        unset($_SESSION['is_guest']);
+
+        unset($_SESSION["permissions"]);
+    }
+
+    private function unset_class() {
+        $this->user_id = null;
+        $this->username = null;
+        $this->is_logged = false;
+        $this->is_admin = false;
+        $this->is_banned = false;
+        $this->is_guest = true;
+
+        $this->permissions = array();
+    }
+    
+    private function check_session() {
+        if (isset($_SESSION['user_id'])) {
+            $this->user_id = $_SESSION['user_id'];
+            $this->username = $_SESSION['username'];
+            $this->is_logged = $_SESSION['is_logged'];
+            $this->is_admin = $_SESSION['is_admin'];
+            $this->is_banned = $_SESSION['is_banned'];
+            $this->is_guest = $_SESSION['is_guest'];
+
+            $this->permissions = $_SESSION["permissions"];
+        }
+    }
 }
