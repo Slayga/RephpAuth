@@ -1,26 +1,45 @@
 /* General styling for all pages */
 
-*, *::after, *::before {
+*,
+*::after,
+*::before {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-.alert, #alert {
-    /* Red */
-    background-color: #fd8880cb;
+body {
+  background-color: #333;
 }
 
-.navbar, #navbar {
-    /* Modern light blue background */
-    background-color: #16488e9f;
-    display:grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr;
-    grid-template-areas: "logo navbar-links";
-    grid-gap: 10px;
-    justify-items: center;
-    align-items: center;
-    padding: 10px;
-    
-  }
+.alert,
+#alert {
+  /* Red */
+  background-color: #fd8880cb;
+}
+
+.navbar,
+#navbar {
+  /* Modern light blue background */
+  background-color: #38629c9f;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "logo navbar-links";
+  grid-gap: 10px;
+  justify-items: center;
+  align-items: center;
+  padding: 10px;
+}
+
+a {
+  text-decoration: none;
+  color: #ffffff;
+  transition: box-shadow 0.5s ease-in-out;
+}
+
+a:hover,
+a:focus {
+  /* text-decoration: underline; */
+  box-shadow: 0 3px 0 #808dff;
+}
