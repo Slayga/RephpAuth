@@ -3,6 +3,7 @@
     <input type="text" name="username" placeholder="Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <input type="hidden" name="current_form" value="login">
+    <input type="hidden" name="unique_rand" value="<?php echo $_SESSION['unique_rand']; ?>">
     <input type="submit" name="login" value="login">
 </form>
 <!-- Register here redirect -->

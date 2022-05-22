@@ -1,21 +1,25 @@
 <?php 
-
+// Sync autoload the authenticate class. And starts the session
 require_once __DIR__ . './includes/sync.inc.php';
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-    // Login form submitted
-    if (isset($_POST["login"])) {
-        $username = $_POST["username"];
-        $password = $_POST["password"];
-        $return = $auth->login($username, $password);
+    // Unique rand is used to prevent resubmission through refresh. Only affect login and signup requests
+    if (isset($_POST["unique_rand"]) && isset($_SESSION["unique_rand"]) && $_POST["unique_rand"] === $_SESSION["unique_rand"]) {
+        // Login form submitted
+        if (isset($_POST["login"])) {
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $return = $auth->login($username, $password);
 
-    // Signup form submitted
-    } else if (isset($_POST["signup"])) {
-        $username = $_POST["username"];
-        $password = $_POST["password"];
-        $auto_login = $_POST["auto_login"] ?? false;
-        $return = $auth->signup($username, $password, $auto_login);
+        // Signup form submitted
+        } else if (isset($_POST["signup"])) {
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $auto_login = $_POST["auto_login"] ?? false;
+            $return = $auth->signup($username, $password, $auto_login);
 
+            
+        }
     // Logout form submitted
     } else if (isset($_POST["logout"])) {
         $return = $auth->logout();
@@ -37,9 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     if (isset($return) && $return["error"]) {
         // Return has "error" and "message" keys to give feedback to user
     } 
-    
-
 }
+
+// Generates unique identifier for forms
+$_SESSION['unique_rand'] = strval(rand());
 ?>
 
 <!DOCTYPE html>
