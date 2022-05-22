@@ -61,13 +61,18 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     <main>
         <div class="form-wrap">
             <?php
-            $current = $_SESSION['current_form'] ?? "login";
-            if ($current == "login") {
-                include_once "login.php";
-            } else if ($current == "signup") {
-                include_once "signup.php";
-            } if (isset($return) && $return["error"]) {
-                echo "<p class='alert'>{$return['message']}</p>";
+            if (!$auth->is_logged) {
+                $current_form = $_SESSION['current_form'] ?? "login";
+                if ($current_form == "login") {
+                    include_once "login.php";
+                } else if ($current_form == "signup") {
+                    include_once "signup.php";
+                } if (isset($return) && $return["error"]) {
+                    echo "<p class='alert'>{$return['message']}</p>";
+                }
+            } else {
+                echo "<p>You are logged in as {$auth->username}</p>";
+                include_once "logout.php";
             }
         ?>
         </div>
