@@ -3,5 +3,9 @@
     <input type="text" name="username" placeholder="Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <input type="checkbox" name="auto_login" value="1"> Auto login
-    <input type="submit" name="login" value="login">
+    <input type="submit" name="signup" value="signup">
+</form>
+<form action="./" method="post" id="login_redirect">
+    <input type="hidden" name="login_redirect" value="login_redirect">
+    <a href="javascript:;" onclick="parentNode.submit();">Already registered?</a>
 </form>

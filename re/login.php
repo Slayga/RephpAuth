@@ -4,7 +4,8 @@
     <input type="password" name="password" placeholder="Password" required>
     <input type="submit" name="login" value="login">
 </form>
-<form action="./" method="post" id="reg">
-    <input type="hidden" name="reg" value="reg">
+<!-- Register here redirect -->
+<form action="./" method="post" id="signup_redirect">
+    <input type="hidden" name="signup_redirect" value="signup_redirect">
     <a href="javascript:;" onclick="parentNode.submit();">Register here!</a>
 </form>
