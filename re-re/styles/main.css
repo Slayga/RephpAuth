@@ -1,0 +1,12 @@
+/* General styling for all pages */
+
+*, *::after, *::before {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.alert, #alert {
+    /* Red */
+    background-color: #fd8880cb;
+}
