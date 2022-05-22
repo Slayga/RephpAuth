@@ -1,8 +1,6 @@
 <?php 
-require_once __DIR__ . './config.php';
-require_once __DIR__ . "./classes/auth.cls.php";
 
-$auth = new ReAuthentication($config);
+require_once __DIR__ . './includes/sync.inc.php';
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
     // Login form submitted
@@ -21,10 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     // Logout form submitted
     } else if (isset($_POST["logout"])) {
         $return = $auth->logout();
-
-    // Redirect to signup form
     } 
     
+    // Redirect to signup form
     if (isset($_POST["signup_redirect"])) {
         $_SESSION['current_form'] = "signup";
     
@@ -60,8 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 </head>
 
 <body>
-    <header>
-        <h1>Gallery</h1>
+    <header class="navbar">
+        <?php include_once __DIR__ . "./includes/templates/header.php"; ?>
     </header>
 
     <main>
