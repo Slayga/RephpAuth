@@ -57,19 +57,47 @@ $_SESSION['unique_rand'] = strval(rand());
 
     <!-- Include main stylesheet -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/layout_grid.css">
+    <link rel="stylesheet" href="styles/index.css">
 
     <title>Document</title>
 </head>
 
 <body>
-    <header class="navbar">
+    <header class="header navbar">
         <?php include_once __DIR__ . "./includes/templates/header.php"; ?>
     </header>
 
-    <main>
+    <main class="main">
+        <?php if(!$auth->is_logged) { ?>
         <div class="form-wrap">
-            <?php
-            if (!$auth->is_logged) {
+            <form action="./" method="post">
+                <input type="hidden" name="unique_rand" value="<?php echo $_SESSION['unique_rand']; ?>">
+                <input type="hidden" name="current_form" value="<?php echo $_SESSION['current_form']; ?>">
+                <input type="hidden" name="login_redirect" value="true">
+                <input type="submit" name="login" value="login">
+            </form>
+            <p class="alert">
+                <?php if (isset($return) && $return["error"]) {echo $return["message"];} ?>
+            </p>
+        </div>
+        <?php } ?>
+
+    </main>
+
+    <footer class="footer"></footer>
+</body>
+
+</html>
+
+<!-- To remove -->
+
+
+
+<?php 
+            if (!$auth->is_logged) { ?>
+<div class="form-wrap">
+    <?php
                 $current_form = $_SESSION['current_form'] ?? "login";
                 if ($current_form == "login") {
                     include_once __DIR__ . "/includes/forms/login.inc.php";
@@ -81,11 +109,8 @@ $_SESSION['unique_rand'] = strval(rand());
             } else {
                 echo "<p>You are logged in as {$auth->username}</p>";
                 include_once __DIR__ . "/includes/forms/logout.inc.php";
+        ?>
+</div>
+<?php    
             }
         ?>
-        </div>
-    </main>
-
-</body>
-
-</html>
