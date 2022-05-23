@@ -8,13 +8,16 @@ The main purpose is to provide knowledge on how to:
  Database will store information about the images. And the images will be stored in the folder "images/gallery/$username".
 -->
 
-<!-- User info that is stored in the database:
-    1. uid
-    2. username
-    3. password
-    4. admin (0 or 1)
-    5. alias
-    6. suspended (0 or 1)
+<!-- User info that is stored in the database: 
+1. uid
+2. username
+3. password
+4. admin (0 or 1)
+5. alias
+6. suspended (0 or 1)
+
+Note on the 23rd of May, 2022:
+(this is now out of date, new list is: id, username, password, is_banned, is_admin, permissions) 
  -->
 
 <!-- Image information that is stored in the database:
@@ -28,6 +31,9 @@ The main purpose is to provide knowledge on how to:
     8. saves (number of times the image is saved)
     9. views (number of times the image is viewed)
     10. comments (number of comments)
+
+Note on the 23rd of May, 2022:
+(this is now out of date, new list is: name, description, is_public, posted_by, file_name) 
   -->
 
 <!-- Server functionalities that are available:
@@ -56,6 +62,11 @@ The main purpose is to provide knowledge on how to:
     24. Gallery saved posts (account required, users can view their own saved posts)
 
 Note: Database settings are set in the file "php/includes/config.php" in the array called "db_config". db_name, db_host, db_password, etc.
+
+Note on the 23rd of May, 2022:
+This is heavily outdated, the idea was there but was simply to complex to be implemented in the time window.
+php/includes/config.php idea is still used, not in includes  but parent folder, and is a php file $config array with key values 
+that define a config for specific stuff, for example $config["db"] returns an array of database values
 -->
 
 
