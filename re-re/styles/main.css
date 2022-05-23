@@ -33,12 +33,28 @@ body {
 
 a {
   text-decoration: none;
-  color: #ffffff;
+  color: #556cff;
   transition: box-shadow 0.5s ease-in-out;
 }
 
 a:hover,
 a:focus {
   /* text-decoration: underline; */
-  box-shadow: 0 3px 0 #808dff;
+  box-shadow: 0 2px 0 #556cff;
+}
+
+form.form_to_db {
+  padding:1em;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  grid-gap: 10px;
+  justify-items: center;
+  align-items: center;
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
 }
