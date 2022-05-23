@@ -25,7 +25,6 @@ if (!$auth->is_logged) {
     <header class="navbar">
         <?php
         include_once __DIR__ . "./includes/templates/header.php"; 
-        
         ?>
     </header>
 </body>
