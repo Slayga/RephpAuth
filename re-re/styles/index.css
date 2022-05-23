@@ -1,0 +1,15 @@
+header.header {
+  background-color: #ffffff;
+  /* Border at the bottom */
+  border-bottom: 1px solid #e5e5e5;
+}
+
+main.main {
+  background-color: #ffffff;
+  padding-inline: 10em;
+}
+
+footer.footer {
+  background-color: #ffffff;
+  padding-inline: 10em;
+}
