@@ -3,7 +3,7 @@
 require_once __DIR__ . './includes/sync.inc.php';
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-    // Unique rand is used to prevent resubmission through refresh. Only affect login and signup requests
+    // Unique rand is used to prevent resubmission through refresh. Only affect login and signup and logout requests
     if (isset($_POST["unique_rand"]) && isset($_SESSION["unique_rand"]) && $_POST["unique_rand"] === $_SESSION["unique_rand"]) {
         // Login form submitted
         if (isset($_POST["login"])) {
@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
     
     if (isset($return) && $return["error"]) {
         // Return has "error" and "message" keys to give feedback to user
+        // If ever wanted to do something  before the html is generated and an error is returned do it here...
     } 
 }
 
@@ -69,14 +70,13 @@ $_SESSION['unique_rand'] = strval(rand());
     </header>
 
     <main class="main">
-        <?php if(!$auth->is_logged) { ?>
+
+        <?php if(!$auth->is_logged) { 
+            $current_form = $_SESSION['current_form'] ?? "login"; ?>
         <div class="form-wrap">
-            <form action="./" method="post">
-                <input type="hidden" name="unique_rand" value="<?php echo $_SESSION['unique_rand']; ?>">
-                <input type="hidden" name="current_form" value="<?php echo $_SESSION['current_form']; ?>">
-                <input type="hidden" name="login_redirect" value="true">
-                <input type="submit" name="login" value="login">
-            </form>
+            <h2>Login</h2>
+            <?php if ($current_form == "login") {include __DIR__ . "/includes/forms/login.inc.php";
+                } elseif ($current_form == "signup") {include __DIR__ . "/includes/forms/signup.inc.php";}?>
             <p class="alert">
                 <?php if (isset($return) && $return["error"]) {echo $return["message"];} ?>
             </p>
@@ -89,28 +89,3 @@ $_SESSION['unique_rand'] = strval(rand());
 </body>
 
 </html>
-
-<!-- To remove -->
-
-
-
-<?php 
-            if (!$auth->is_logged) { ?>
-<div class="form-wrap">
-    <?php
-                $current_form = $_SESSION['current_form'] ?? "login";
-                if ($current_form == "login") {
-                    include_once __DIR__ . "/includes/forms/login.inc.php";
-                } else if ($current_form == "signup") {
-                    include_once __DIR__ . "/includes/forms/signup.inc.php";
-                } if (isset($return) && $return["error"]) {
-                    echo "<p class='alert'>{$return['message']}</p>";
-                }
-            } else {
-                echo "<p>You are logged in as {$auth->username}</p>";
-                include_once __DIR__ . "/includes/forms/logout.inc.php";
-        ?>
-</div>
-<?php    
-            }
-        ?>
