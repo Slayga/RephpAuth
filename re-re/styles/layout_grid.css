@@ -1,0 +1,28 @@
+:root {
+  /* Grid named areas */
+  /* grid-template-areas: */
+  --primary-grid: "header" "main" "footer";
+  --header-grid: "logo nav profile";
+  /* Main-grid will be automatically generated */
+  --footer-grid: "left right";
+}
+
+body {
+  display: grid;
+  grid-template-areas: var(--primary-grid);
+  grid-auto-rows: 6vh auto 10vh;
+
+  min-height: 100vh;
+}
+
+header.navbar {
+  grid-area: header;
+}
+
+main.main {
+  grid-area: main;
+}
+
+footer.footer {
+  grid-area: footer;
+}
