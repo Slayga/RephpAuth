@@ -5,7 +5,7 @@ include_once __DIR__ . "/database.cls.php";
 
 class ReAuthentication {
     // What will authenticate do?
-    // Constructor will be used to set up the database connection
+    // (0.) Constructor will be used to set up the database connection
     // 1. Handle login
     // 2. Handle logout
     // 3. Handle signup
