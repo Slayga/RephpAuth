@@ -1,5 +1,5 @@
 <!-- Login form -->
-<form action="./" method="post">
+<form action="./" method="post" class="form_to_db">
     <input type="text" name="username" placeholder="Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <input type="hidden" name="current_form" value="login">
@@ -9,5 +9,5 @@
 <!-- Register here redirect -->
 <form action="./" method="post" id="signup_redirect">
     <input type="hidden" name="signup_redirect" value="signup_redirect">
-    <a href="javascript:;" onclick="parentNode.submit();">Register here!</a>
+    Not registered? <a href="javascript:;" onclick="parentNode.submit();">Signup!</a>
 </form>

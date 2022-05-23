@@ -1,5 +1,5 @@
 <!-- Signup form with login check box, with text -->
-<form action="./" method="post">
+<form action="./" method="post" class="form_to_db">
     <input type="text" name="username" placeholder="Username" required>
     <input type="password" name="password" placeholder="Password" required>
     <input type="checkbox" name="auto_login" value="1"> Auto login
