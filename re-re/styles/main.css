@@ -14,7 +14,6 @@ body {
 
 .alert,
 #alert {
-  /* Red */
   background-color: #fd8880cb;
 }
 
@@ -25,7 +24,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr;
-  grid-template-areas: "logo navbar-links";
+  grid-template-areas: "logo navbar-links profile";
   grid-gap: 10px;
   justify-items: center;
   align-items: center;
